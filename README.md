@@ -108,4 +108,4 @@ Generated schemas include:
 - **Descriptions:** auto-generated field descriptions
 
 # LICENSE
-This PDF Document to JSON Schema Generator is under [MIT LICENSE]()# pdf_schema_generator
+This PDF Document to JSON Schema Generator is under [MIT LICENSE](https://github.com/BipronathSaha12/pdf_schema_generator/blob/main/LICENSE)
