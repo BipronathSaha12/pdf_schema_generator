@@ -35,7 +35,7 @@ pip install -r requirements.txt
 ### 2. Run the Server
 
 ```bash
-uvicorn backend.main:app --reload
+python manage.py runserver
 ```
 
 ### 3. Open the App
