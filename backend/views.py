@@ -72,14 +72,30 @@ def generate_schema_endpoint(request):
 
         schema = add_validation_rules(schema)
         validation = validate_schema(schema)
+        
+        # Build extracted data object
+        extracted_data = {
+            "document_type": parsed.get("document_type"),
+            "summary": parsed.get("document_summary"),
+            "fields": {pair["key"]: pair["value"] for pair in parsed.get("key_value_pairs", [])},
+        }
+        
+        if parsed.get("sections"):
+            extracted_data["sections"] = {sec["title"]: sec["content"] for sec in parsed.get("sections", [])}
+        
+        if parsed.get("tables"):
+            extracted_data["tables"] = parsed.get("tables")
 
         return Response(
             {
                 "schema": schema,
                 "validation": validation,
+                "extracted_data": extracted_data,
                 "document_info": {
                     "filename": file.name,
+                    "document_type": parsed.get("document_type"),
                     "pages": parsed["page_count"],
+                    "word_count": parsed.get("word_count", 0),
                     "fields_detected": len(parsed["key_value_pairs"]),
                     "tables_detected": len(parsed["tables"]),
                     "sections_detected": len(parsed["sections"]),

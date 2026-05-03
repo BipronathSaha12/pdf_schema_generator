@@ -1,50 +1,64 @@
 # PDF Document to JSON Schema Generator
 
-A production-ready full-stack application that analyzes complex PDF documents (invoices, bank statements, resumes) and generates deeply nested JSON schemas with validation rules.
+A Django-based full-stack application that converts PDF documents into structured JSON Schemas and validates them through a lightweight browser UI.
 
 ## Tech Stack
 
-- **Backend:** Django (Python)
-- **Frontend:** HTML + TailwindCSS + Vanilla JS
-- **Validation:** jsonschema library
-- **PDF Parsing:** PyPDF2
-- **Authentication:** JWT (scaffold included)
+- **Backend:** Django + Django REST Framework
+- **Frontend:** HTML + Bootstrap + Vanilla JavaScript
+- **Styles:** `frontend/styles.css`
+- **Scripts:** `frontend/app.js`
+- **PDF Parsing:** custom parser in `backend/pdf_parser.py`
+- **Schema Generation:** `backend/schema_generator.py`
+- **Validation:** `backend/validator.py`
 
 ## Features
 
-- Upload PDF documents (25-150 pages supported)
-- Extract text, key-value pairs, tables, and sections from PDFs
-- Automatically detect fields and structure
-- Generate nested JSON Schema (Draft 2020-12)
-- Support for objects within arrays, multi-level nesting, required/optional fields, type inference
-- Validation rules: required fields, min/max, null checks, sum validation
-- Interactive schema editor in the UI
-- Download generated schemas as JSON
-- REST API with full OpenAPI documentation
-- JWT authentication scaffold
+- Upload PDF documents and generate JSON Schema output
+- Detect document fields, tables, sections, and metadata
+- Build nested JSON Schema conforming to Draft 2020-12
+- Validate schemas and data via REST endpoints
+- Interactive editor with copy, format, validate, and download actions
+- Built-in example schema preview and API health check
+- JWT authentication scaffold for future extension
 
 ## Quick Start
 
-### 1. Install Dependencies
+1. Install dependencies
 
 ```bash
-cd pdf-schema-generator
-pip install -r requirements.txt
+cd f:\pdf-schema-generator
+python -m pip install -r requirements.txt
 ```
 
-### 2. Run the Server
+2. Run database migrations (optional on first run)
+
+```bash
+python manage.py migrate
+```
+
+3. Start the development server
 
 ```bash
 python manage.py runserver
 ```
 
-### 3. Open the App
+4. Open the app
 
-Navigate to [http://localhost:8000](http://localhost:8000) in your browser.
+Navigate to `http://localhost:8000`
 
-### 4. API Documentation
+## Frontend Files
 
-Interactive API docs available at [http://localhost:8000/docs](http://localhost:8000/docs)
+- `frontend/index.html` — main UI template
+- `frontend/bootstrap.css` — Bootstrap stylesheet entrypoint for static loading
+- `frontend/styles.css` — extracted CSS styles
+- `frontend/app.js` — UI and API integration logic
+
+## Deploying to Render
+
+- `render.yaml` configures a Python web service on Render.
+- `Procfile` starts the app with `gunicorn config.wsgi`.
+- `whitenoise` is enabled in Django to serve static assets in production.
 
 ## Project Structure
 
@@ -52,60 +66,64 @@ Interactive API docs available at [http://localhost:8000/docs](http://localhost:
 pdf-schema-generator/
 ├── backend/
 │   ├── __init__.py
-│   ├── main.py              # FastAPI app, routes, CORS, example schema
-│   ├── pdf_parser.py         # PDF text extraction and structure detection
-│   ├── schema_generator.py   # JSON schema generation with type inference
-│   ├── validator.py          # Schema validation and data validation
-│   └── auth.py               # JWT authentication scaffold
+│   ├── apps.py
+│   ├── pdf_parser.py
+│   ├── schema_generator.py
+│   ├── serializers.py
+│   ├── validator.py
+│   ├── views.py
+│   └── urls.py
+├── config/
+│   ├── __init__.py
+│   ├── asgi.py
+│   ├── settings.py
+│   ├── urls.py
+│   └── wsgi.py
 ├── frontend/
-│   └── index.html            # Single-page UI with TailwindCSS
+│   ├── index.html
+│   ├── styles.css
+│   └── app.js
 ├── examples/
-│   ├── invoice_schema.json   # Example invoice JSON schema
-│   └── api_request.md        # Example API requests (curl)
-├── requirements.txt
-├── venv/                     # Python virtual environment
-└── README.md
+│   ├── api_request.md
+│   └── invoice_schema.json
+├── db.sqlite3
+├── manage.py
+├── README.md
+└── requirements.txt
 ```
 
 ## API Endpoints
 
 | Method | Path | Description |
 |--------|------|-------------|
-| POST | `/api/generate-schema` | Upload PDF and generate JSON schema |
-| POST | `/generate-schema` | Alias for the above |
-| POST | `/api/validate-schema` | Validate a JSON schema |
+| POST | `/api/generate-schema` | Upload PDF and generate JSON Schema |
+| POST | `/generate-schema` | Alias for schema generation |
+| POST | `/api/validate-schema` | Validate a JSON schema payload |
 | POST | `/api/validate-data` | Validate data against a schema |
-| GET | `/api/example-schema` | Get example invoice schema |
+| GET | `/api/example-schema` | Fetch an example invoice schema |
 | GET | `/api/health` | Health check |
 | POST | `/api/auth/register` | Register a new user |
-| POST | `/api/auth/login` | Login and get JWT token |
+| POST | `/api/auth/login` | Login and receive JWT token |
 
-## Example Usage
+## Using the Web UI
 
-### Upload a PDF via API
+1. Open `http://localhost:8000`
+2. Drop a PDF or click to browse
+3. Confirm the selected file
+4. Click **Generate Schema**
+5. Edit the schema, then copy, validate, format, or download it
+
+## Example API Request
 
 ```bash
 curl -X POST http://localhost:8000/api/generate-schema -F "file=@invoice.pdf"
 ```
 
-### Using the Web UI
+## Notes
 
-1. Open http://localhost:8000
-2. Drag & drop a PDF or click to browse
-3. Click "Generate Schema"
-4. Edit the schema in the built-in editor
-5. Download or copy the result
+- The frontend is now split into `frontend/index.html`, `frontend/styles.css`, and `frontend/app.js`.
+- The backend uses Django views and DRF endpoints defined in `backend/views.py` and `backend/urls.py`.
 
-## Schema Features
+## License
 
-Generated schemas include:
-
-- **Type inference:** string, integer, number, boolean, date, null
-- **Nested objects:** multi-level nesting from document sections
-- **Arrays of objects:** from detected tables
-- **Validation rules:** minLength, minimum, maximum, format, pattern, required
-- **Document metadata:** page count, extraction timestamp
-- **Descriptions:** auto-generated field descriptions
-
-# LICENSE
-This PDF Document to JSON Schema Generator is under [MIT LICENSE](https://github.com/BipronathSaha12/pdf_schema_generator/blob/main/LICENSE)
+This project is licensed under the MIT License. See `LICENSE` for details.

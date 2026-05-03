@@ -1,286 +1,19 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="keywords" content="PDF, JSON Schema, Django, Document Analysis, Web Application">
+    <meta name="author" content="Bipronath Saha">
+    <meta name="description" content="A web application that generates JSON schemas from PDF documents using Django. Upload PDFs and get structured data schemas in seconds.">
+    <meta property="og:title" content="PDF to JSON Schema Generator">
     <title>PDF to JSON Schema Generator</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'bootstrap.css' %}">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
-    <style>
-        :root {
-            --primary-color: #0d6efd;
-            --success-color: #198754;
-            --danger-color: #dc3545;
-            --warning-color: #ffc107;
-            --info-color: #0dcaf0;
-        }
-
-        body {
-            background-color: #f8f9fa;
-            min-height: 100vh;
-        }
-
-        .schema-editor {
-            font-family: 'Courier New', monospace;
-            font-size: 13px;
-            line-height: 1.5;
-            background-color: #1e1e1e;
-            color: #00ff00;
-            border: 1px solid #333;
-            padding: 1rem;
-            border-radius: 0.375rem;
-        }
-
-        .drop-zone {
-            border: 2px dashed #dee2e6;
-            border-radius: 0.75rem;
-            padding: 3rem 1rem;
-            text-align: center;
-            background-color: white;
-            transition: all 0.3s ease;
-            cursor: pointer;
-        }
-
-        .drop-zone:hover {
-            border-color: var(--primary-color);
-            background-color: #f0f6ff;
-        }
-
-        .drop-zone.dragover {
-            border-color: var(--primary-color);
-            background-color: #e7f1ff;
-            box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.1);
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        .spinner {
-            animation: spin 1s linear infinite;
-        }
-
-        .fade-in {
-            animation: fadeIn 0.3s ease-in;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .stat-card {
-            background: white;
-            border-radius: 0.5rem;
-            padding: 1.5rem;
-            border: 1px solid #dee2e6;
-            text-align: center;
-        }
-
-        .stat-card .stat-value {
-            font-size: 1.75rem;
-            font-weight: 700;
-            color: var(--primary-color);
-        }
-
-        .stat-card .stat-label {
-            font-size: 0.875rem;
-            color: #6c757d;
-            margin-top: 0.5rem;
-        }
-
-        .header {
-            background: white;
-            border-bottom: 1px solid #dee2e6;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-        }
-
-        .logo-icon {
-            width: 2.5rem;
-            height: 2.5rem;
-            background: var(--primary-color);
-            border-radius: 0.375rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .logo-icon i {
-            color: white;
-            font-size: 1.5rem;
-        }
-
-        .validation-valid {
-            background-color: #d1e7dd;
-            border-color: #badbcc;
-            color: #0f5132;
-        }
-
-        .validation-warning {
-            background-color: #fff3cd;
-            border-color: #ffecb5;
-            color: #664d03;
-        }
-
-        .btn-action {
-            padding: 0.5rem 1rem;
-            font-size: 0.875rem;
-            border-radius: 0.375rem;
-        }
-
-        @media (max-width: 768px) {
-            .drop-zone {
-                padding: 2rem 0.75rem;
-            }
-
-            .stat-card {
-                padding: 1rem;
-            }
-
-            .stat-card .stat-value {
-                font-size: 1.5rem;
-            }
-
-            .header {
-                padding: 0.75rem 0;
-            }
-
-            .schema-editor {
-                font-size: 12px;
-            }
-
-            .btn-action {
-                padding: 0.375rem 0.75rem;
-                font-size: 0.8125rem;
-            }
-        }
-
-        /* Dark Theme */
-        body.dark-theme {
-            background-color: #1a1a1a;
-            color: #e0e0e0;
-        }
-
-        body.dark-theme .header {
-            background-color: #2d2d2d;
-            border-bottom-color: #444;
-        }
-
-        body.dark-theme .card,
-        body.dark-theme .drop-zone {
-            background-color: #2d2d2d;
-            border-color: #444;
-            color: #e0e0e0;
-        }
-
-        body.dark-theme .drop-zone:hover {
-            background-color: #3a3a3a;
-            border-color: #0d6efd;
-        }
-
-        body.dark-theme .stat-card {
-            background-color: #2d2d2d;
-            border-color: #444;
-        }
-
-        body.dark-theme .stat-card .stat-label {
-            color: #b0b0b0;
-        }
-
-        body.dark-theme .btn-outline-secondary {
-            color: #e0e0e0;
-            border-color: #444;
-        }
-
-        body.dark-theme .btn-outline-secondary:hover {
-            background-color: #444;
-            border-color: #666;
-        }
-
-        body.dark-theme .bg-light {
-            background-color: #3a3a3a !important;
-        }
-
-        body.dark-theme .text-muted {
-            color: #b0b0b0 !important;
-        }
-
-        body.dark-theme .modal-content {
-            background-color: #2d2d2d;
-            border-color: #444;
-            color: #e0e0e0;
-        }
-
-        body.dark-theme .modal-header,
-        body.dark-theme .modal-footer {
-            border-color: #444;
-        }
-
-        body.dark-theme h1,
-        body.dark-theme h2,
-        body.dark-theme h3,
-        body.dark-theme h4,
-        body.dark-theme h5,
-        body.dark-theme .text-dark {
-            color: #e0e0e0;
-        }
-
-        body.dark-theme footer {
-            background-color: #2d2d2d;
-            border-top-color: #444;
-        }
-
-        .theme-toggle-btn {
-            cursor: pointer;
-            padding: 0.375rem 0.75rem;
-            border-radius: 0.375rem;
-            background-color: transparent;
-            border: 1px solid #dee2e6;
-            transition: all 0.3s ease;
-        }
-
-        .theme-toggle-btn:hover {
-            background-color: #f0f0f0;
-            border-color: #0d6efd;
-        }
-
-        body.dark-theme .theme-toggle-btn {
-            border-color: #444;
-        }
-
-        body.dark-theme .theme-toggle-btn:hover {
-            background-color: #444;
-        }
-
-        @media (max-width: 576px) {
-            body {
-                font-size: 14px;
-            }
-
-            .drop-zone {
-                padding: 1.5rem 0.5rem;
-            }
-
-            .stat-card {
-                padding: 0.75rem;
-            }
-
-            .stat-card .stat-value {
-                font-size: 1.25rem;
-            }
-
-            h1 {
-                font-size: 1.25rem;
-            }
-
-            .schema-editor {
-                height: 300px;
-                overflow-y: auto;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="{% static 'styles.css' %}">
 </head>
-<body>
+<body class="d-flex flex-column min-vh-100">
     <!-- Header -->
     <header class="header sticky-top py-3 py-md-4">
         <div class="container-fluid">
@@ -311,9 +44,10 @@
         </div>
     </header>
 
-    <main class="container-fluid py-4 py-md-5">
-        <!-- Upload Section -->
-        <div id="upload-section" class="mb-4">
+    <main class="container-fluid py-4 py-md-5 flex-grow-1">
+        <div class="content-wrap mx-auto">
+            <!-- Upload Section -->
+            <div id="upload-section" class="mb-4">
             <div id="drop-zone" class="drop-zone" onclick="document.getElementById('file-input').click()">
                 <input type="file" id="file-input" accept=".pdf" class="d-none" onchange="handleFileSelect(event)">
                 <i class="bi bi-cloud-arrow-up text-muted" style="font-size: 3rem; display: block; margin-bottom: 1rem;"></i>
@@ -427,7 +161,7 @@
                         </div>
                         <div class="col-auto ms-auto">
                             <div class="btn-group btn-group-sm" role="group">
-                                <button onclick="copySchema()" class="btn btn-outline-secondary btn-action" title="Copy to clipboard">
+                                <button onclick="copySchema(event)" class="btn btn-outline-secondary btn-action" title="Copy to clipboard">
                                     <i class="bi bi-clipboard"></i> Copy
                                 </button>
                                 <button onclick="formatSchema()" class="btn btn-outline-secondary btn-action" title="Format JSON">
@@ -452,10 +186,11 @@
                 </div>
             </div>
         </div>
+        </div>
     </main>
 
     <!-- Footer -->
-    <footer class="border-top bg-white mt-5">
+    <footer class="border-top bg-white mt-auto">
         <div class="container-fluid py-4 text-center">
             <p class="text-muted small mb-0">
                 JSON Schema Generator &mdash; Developed by <strong>Bipronath Saha</strong>
@@ -464,6 +199,7 @@
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{% static 'app.js' %}"></script>
 
     <!-- Confirmation Modal -->
     <div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
@@ -516,301 +252,5 @@
         </div>
     </div>
 
-    <script>
-        let selectedFile = null;
-        let currentSchema = null;
-        let originalSchema = null;
-
-        // Initialize theme
-        function initTheme() {
-            const savedTheme = localStorage.getItem('theme') || 'light';
-            if (savedTheme === 'dark') {
-                document.body.classList.add('dark-theme');
-                document.getElementById('theme-icon').classList.remove('bi-moon-stars');
-                document.getElementById('theme-icon').classList.add('bi-sun');
-            }
-        }
-
-        // Toggle theme
-        function toggleTheme() {
-            const isDark = document.body.classList.toggle('dark-theme');
-            const themeIcon = document.getElementById('theme-icon');
-            if (isDark) {
-                themeIcon.classList.remove('bi-moon-stars');
-                themeIcon.classList.add('bi-sun');
-                localStorage.setItem('theme', 'dark');
-            } else {
-                themeIcon.classList.remove('bi-sun');
-                themeIcon.classList.add('bi-moon-stars');
-                localStorage.setItem('theme', 'light');
-            }
-        }
-
-        // Initialize on page load
-        window.addEventListener('DOMContentLoaded', initTheme);
-
-        // Drag and drop
-        const dropZone = document.getElementById('drop-zone');
-
-        ['dragenter', 'dragover'].forEach(event => {
-            dropZone.addEventListener(event, (e) => {
-                e.preventDefault();
-                dropZone.classList.add('dragover');
-            });
-        });
-
-        ['dragleave', 'drop'].forEach(event => {
-            dropZone.addEventListener(event, (e) => {
-                e.preventDefault();
-                dropZone.classList.remove('dragover');
-            });
-        });
-
-        dropZone.addEventListener('drop', (e) => {
-            const files = e.dataTransfer.files;
-            if (files.length > 0 && files[0].name.toLowerCase().endsWith('.pdf')) {
-                selectedFile = files[0];
-                showConfirmationDialog();
-            }
-        });
-
-        function handleFileSelect(event) {
-            selectedFile = event.target.files[0];
-            if (selectedFile) showConfirmationDialog();
-        }
-
-        function showConfirmationDialog() {
-            document.getElementById('confirm-file-name').textContent = selectedFile.name;
-            const sizeMB = (selectedFile.size / (1024 * 1024)).toFixed(2);
-            document.getElementById('confirm-file-size').textContent = `${sizeMB} MB`;
-            
-            const confirmModal = new bootstrap.Modal(document.getElementById('confirmModal'));
-            confirmModal.show();
-        }
-
-        function confirmGenerateSchema() {
-            generateSchema();
-        }
-
-        function showFileInfo() {
-            document.getElementById('file-info').classList.remove('d-none');
-            document.getElementById('file-name').textContent = selectedFile.name;
-            const sizeMB = (selectedFile.size / (1024 * 1024)).toFixed(2);
-            document.getElementById('file-size').textContent = `${sizeMB} MB`;
-        }
-
-        function clearFile() {
-            selectedFile = null;
-            document.getElementById('file-input').value = '';
-            document.getElementById('file-info').classList.add('d-none');
-            document.getElementById('results-section').classList.add('d-none');
-            document.getElementById('error-section').classList.add('d-none');
-        }
-
-        async function generateSchema() {
-            if (!selectedFile) return;
-
-            document.getElementById('loading').classList.remove('d-none');
-            document.getElementById('results-section').classList.add('d-none');
-            document.getElementById('error-section').classList.add('d-none');
-
-            const formData = new FormData();
-            formData.append('file', selectedFile);
-
-            try {
-                const response = await fetch('/api/generate-schema', {
-                    method: 'POST',
-                    body: formData,
-                });
-
-                if (!response.ok) {
-                    const err = await response.json();
-                    throw new Error(err.detail || 'Failed to generate schema');
-                }
-
-                const data = await response.json();
-                currentSchema = data.schema;
-                originalSchema = JSON.stringify(data.schema);
-                displayResults(data);
-            } catch (error) {
-                showError(error.message);
-            } finally {
-                document.getElementById('loading').classList.add('d-none');
-            }
-        }
-
-        function displayResults(data) {
-            const info = data.document_info;
-            document.getElementById('stat-pages').textContent = info.pages;
-            document.getElementById('stat-fields').textContent = info.fields_detected;
-            document.getElementById('stat-tables').textContent = info.tables_detected;
-            document.getElementById('stat-sections').textContent = info.sections_detected;
-
-            displayValidation(data.validation);
-
-            document.getElementById('schema-editor').value = JSON.stringify(data.schema, null, 2);
-            document.getElementById('results-section').classList.remove('d-none');
-            document.getElementById('edit-badge').classList.add('d-none');
-        }
-
-        function displayValidation(validation) {
-            const iconEl = document.getElementById('validation-icon');
-            const textEl = document.getElementById('validation-text');
-            const statsEl = document.getElementById('schema-stats');
-
-            if (validation.valid) {
-                iconEl.innerHTML = '<i class="bi bi-check-circle-fill text-success" style="font-size: 1.5rem;"></i>';
-                textEl.textContent = 'Schema is valid';
-                textEl.className = 'fw-semibold text-success';
-            } else {
-                iconEl.innerHTML = '<i class="bi bi-exclamation-triangle-fill text-warning" style="font-size: 1.5rem;"></i>';
-                textEl.textContent = `${validation.errors.length} validation warning(s)`;
-                textEl.className = 'fw-semibold text-warning';
-            }
-
-            if (validation.stats) {
-                const s = validation.stats;
-                statsEl.innerHTML = `
-                    <span>Fields: ${s.total_fields}</span>
-                    <span>Required: ${s.required_fields}</span>
-                    <span>Optional: ${s.optional_fields}</span>
-                    <span>Depth: ${s.max_depth}</span>
-                `;
-            }
-        }
-
-        function onSchemaEdit() {
-            const editor = document.getElementById('schema-editor');
-            const badge = document.getElementById('edit-badge');
-            if (editor.value !== originalSchema) {
-                badge.classList.remove('d-none');
-            } else {
-                badge.classList.add('d-none');
-            }
-        }
-
-        function formatSchema() {
-            const editor = document.getElementById('schema-editor');
-            try {
-                const parsed = JSON.parse(editor.value);
-                editor.value = JSON.stringify(parsed, null, 2);
-                currentSchema = parsed;
-            } catch (e) {
-                showError('Invalid JSON: ' + e.message);
-            }
-        }
-
-        async function revalidateSchema() {
-            const editor = document.getElementById('schema-editor');
-            try {
-                const parsed = JSON.parse(editor.value);
-                const response = await fetch('/api/validate-schema', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ schema_payload: parsed }),
-                });
-                const result = await response.json();
-                displayValidation(result);
-            } catch (e) {
-                showError('Invalid JSON: ' + e.message);
-            }
-        }
-
-        function copySchema() {
-            const editor = document.getElementById('schema-editor');
-            navigator.clipboard.writeText(editor.value).then(() => {
-                const btn = event.currentTarget;
-                const original = btn.innerHTML;
-                btn.innerHTML = '<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"/></svg> Copied!';
-                setTimeout(() => { btn.innerHTML = original; }, 2000);
-            });
-        }
-
-        function downloadSchema() {
-            const editor = document.getElementById('schema-editor');
-            const blob = new Blob([editor.value], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            const filename = selectedFile
-                ? selectedFile.name.replace('.pdf', '_schema.json')
-                : 'schema.json';
-            a.download = filename;
-            a.click();
-            URL.revokeObjectURL(url);
-        }
-
-        async function loadExample() {
-            try {
-                const response = await fetch('/api/example-schema');
-                const schema = await response.json();
-                currentSchema = schema;
-                originalSchema = JSON.stringify(schema);
-
-                document.getElementById('stat-pages').textContent = '3';
-                document.getElementById('stat-fields').textContent = '24';
-                document.getElementById('stat-tables').textContent = '1';
-                document.getElementById('stat-sections').textContent = '6';
-
-                const validation = {
-                    valid: true,
-                    stats: { total_fields: 24, required_fields: 14, optional_fields: 10, max_depth: 3 }
-                };
-                displayValidation(validation);
-
-                document.getElementById('schema-editor').value = JSON.stringify(schema, null, 2);
-                document.getElementById('results-section').classList.remove('d-none');
-                document.getElementById('edit-badge').classList.add('d-none');
-                document.getElementById('error-section').classList.add('d-none');
-            } catch (e) {
-                showError('Failed to load example: ' + e.message);
-            }
-        }
-
-        async function showHealthStatus() {
-            const healthModal = new bootstrap.Modal(document.getElementById('healthModal'));
-            healthModal.show();
-
-            try {
-                const response = await fetch('/api/health');
-                const data = await response.json();
-
-                const healthContent = document.getElementById('health-content');
-                if (response.ok) {
-                    healthContent.innerHTML = `
-                        <div class="alert alert-success mb-0">
-                            <i class="bi bi-check-circle-fill"></i> <strong>API is Healthy</strong>
-                            <hr>
-                            <div class="text-start small">
-                                <p class="mb-1"><strong>Status:</strong> ${data.status}</p>
-                                <p class="mb-0"><strong>Version:</strong> ${data.version}</p>
-                            </div>
-                        </div>
-                    `;
-                } else {
-                    healthContent.innerHTML = `
-                        <div class="alert alert-danger mb-0">
-                            <i class="bi bi-exclamation-triangle-fill"></i> <strong>API Error</strong>
-                            <hr>
-                            <pre class="text-start mb-0" style="font-size: 12px; max-height: 200px; overflow-y: auto;">${JSON.stringify(data, null, 2)}</pre>
-                        </div>
-                    `;
-                }
-            } catch (error) {
-                const healthContent = document.getElementById('health-content');
-                healthContent.innerHTML = `
-                    <div class="alert alert-danger mb-0">
-                        <i class="bi bi-exclamation-triangle-fill"></i> <strong>Connection Error</strong>
-                        <p class="text-start mt-2 mb-0">${error.message}</p>
-                    </div>
-                `;
-            }
-        }
-
-        function showError(message) {
-            document.getElementById('error-message').textContent = message;
-            document.getElementById('error-section').classList.remove('d-none');
-        }
-    </script>
 </body>
 </html>

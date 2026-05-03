@@ -4,3 +4,5 @@ django-cors-headers>=4.4.0
 PyPDF2>=3.0.1
 jsonschema>=4.23.0
 djangorestframework-simplejwt>=5.3.0
+gunicorn>=22.0.0
+whitenoise>=1.4.0
