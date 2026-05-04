@@ -4,6 +4,6 @@ services:
     env: python
     plan: free
     branch: main
-    buildCommand: pip install -r requirements.txt
+    buildCommand: bash ./build.sh
     startCommand: gunicorn config.wsgi --log-file -
     healthCheckPath: /api/health
