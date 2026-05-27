@@ -60,38 +60,6 @@ Navigate to `http://localhost:8000`
 - `Procfile` starts the app with `gunicorn config.wsgi`.
 - `whitenoise` is enabled in Django to serve static assets in production.
 
-## Project Structure
-
-```
-pdf-schema-generator/
-├── backend/
-│   ├── __init__.py
-│   ├── apps.py
-│   ├── pdf_parser.py
-│   ├── schema_generator.py
-│   ├── serializers.py
-│   ├── validator.py
-│   ├── views.py
-│   └── urls.py
-├── config/
-│   ├── __init__.py
-│   ├── asgi.py
-│   ├── settings.py
-│   ├── urls.py
-│   └── wsgi.py
-├── frontend/
-│   ├── index.html
-│   ├── styles.css
-│   └── app.js
-├── examples/
-│   ├── api_request.md
-│   └── invoice_schema.json
-├── db.sqlite3
-├── manage.py
-├── README.md
-└── requirements.txt
-```
-
 ## API Endpoints
 
 | Method | Path | Description |
@@ -132,4 +100,4 @@ See [`DATABASE.md`](./DATABASE.md) for a full description of the SQLite database
 
 ## License
 
-This project is licensed under the MIT License. See `LICENSE` for details.
+This project is licensed under the MIT License. See [LICENSE](https://github.com/BipronathSaha12/pdf_schema_generator/blob/main/LICENSE) for details.
