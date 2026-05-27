@@ -1,0 +1,281 @@
+================================================================================
+PDF SCHEMA GENERATOR - UPGRADE GUIDE
+================================================================================
+
+PROJECT OVERVIEW
+================================================================================
+Your project is a Django REST API for PDF schema generation with:
+- Django 5.1+ with DRF
+- SQLite database (db.sqlite3)
+- JWT authentication (simplejwt)
+- Basic HTML/CSS/JS frontend (Bootstrap 4)
+- WhiteNoise for static file serving
+
+Current Stack:
+- backend/          - Django app with views, serializers, urls
+- config/           - Django settings, WSGI, ASGI
+- frontend/         - HTML, CSS, JS (Bootstrap 4)
+- db.sqlite3        - SQLite database (needs upgrade)
+- requirements.txt  - Python dependencies
+
+
+================================================================================
+PART 1: DATABASE UPGRADE - SQLite to PostgreSQL
+================================================================================
+
+WHY POSTGRESQL?
+- Better performance and scalability
+- Supports concurrent connections
+- Better data integrity (ACID compliance)
+- Production-ready
+- Works great with Django
+
+STEP 1: Install PostgreSQL
+--------------------------
+Option A: Local Installation
+- Download from https://www.postgresql.org/download/
+- Install with default settings
+- Remember the username/password you set
+
+Option B: Cloud Database (Recommended for production)
+- Neon (neon.tech) - Free tier available
+- Supabase (supabase.com) - Free tier
+- Railway (railway.app) - Pay-as-you-go
+- Render (render.com) - Free tier available
+
+STEP 2: Install Required Packages
+----------------------------------
+Run this command:
+    pip install psycopg2-binary python-dotenv
+
+Add to requirements.txt:
+    psycopg2-binary>=2.9.0
+    python-dotenv>=1.0.0
+
+STEP 3: Create .env File
+------------------------
+Create a new file called ".env" in the project root:
+    DATABASE_URL=postgresql://user:password@localhost:5432/dbname
+    DJANGO_SECRET_KEY=your-secure-random-secret-key
+    DEBUG=False
+    ALLOWED_HOSTS=localhost,127.0.0.1
+
+STEP 4: Update config/settings.py
+-----------------------------------
+Add these imports at the top:
+    import os
+    from dotenv import load_dotenv
+    load_dotenv()
+
+Replace the DATABASES section with:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            "NAME": os.getenv("DB_NAME", "pdfschema"),
+            "USER": os.getenv("DB_USER", "postgres"),
+            "PASSWORD": os.getenv("DB_PASSWORD", ""),
+            "HOST": os.getenv("DB_HOST", "localhost"),
+            "PORT": os.getenv("DB_PORT", "5432"),
+        }
+    }
+
+STEP 5: Migrate Data
+--------------------
+    # 1. Export current data from SQLite
+    python manage.py dumpdata > db.json
+
+    # 2. Switch to PostgreSQL in settings.py
+
+    # 3. Run migrations
+    python manage.py migrate
+
+    # 4. Import data (if needed)
+    python manage.py loaddata db.json
+
+
+================================================================================
+PART 2: PROFESSIONAL UPGRADES
+================================================================================
+
+1. SECURITY IMPROVEMENTS
+------------------------
+In settings.py, replace ALLOWED_HOSTS = ["*"] with:
+    ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "localhost,127.0.0.1").split(",")
+
+Add to MIDDLEWARE (for production):
+    "django.middleware.security.SecurityMiddleware",
+
+Add these settings at the bottom of settings.py:
+    # Security Settings (for production)
+    if not DEBUG:
+        SECURE_BROWSER_XSS_FILTER = True
+        SECURE_CONTENT_TYPE_NOSNIFF = True
+        X_FRAME_OPTIONS = "DENY"
+        SECURE_SSL_REDIRECT = True
+        SESSION_COOKIE_SECURE = True
+        CSRF_COOKIE_SECURE = True
+
+
+2. ADD ENVIRONMENT VARIABLES SUPPORT
+-------------------------------------
+Create .env file in project root:
+    # Django
+    DJANGO_SECRET_KEY=your-secret-key-here
+    DEBUG=False
+
+    # Database (PostgreSQL)
+    DB_NAME=pdfschema
+    DB_USER=postgres
+    DB_PASSWORD=your-password
+    DB_HOST=localhost
+    DB_PORT=5432
+
+    # CORS
+    ALLOWED_HOSTS=localhost,127.0.0.1,yourdomain.com
+
+
+3. ADD API DOCUMENTATION
+------------------------
+Install:
+    pip install drf-spectacular
+
+Add to INSTALLED_APPS:
+    "drf_spectacular",
+
+Add to REST_FRAMEWORK:
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+
+Add to settings.py:
+    SPECTACULAR_SETTINGS = {
+        "TITLE": "PDF Schema Generator API",
+        "DESCRIPTION": "API for generating JSON schemas from PDF files",
+        "VERSION": "1.0.0",
+    }
+
+Access docs at: /api/schema/swagger/
+
+
+4. ADD TESTING
+--------------
+Install:
+    pip install pytest pytest-django pytest-cov
+
+Create pytest.ini:
+    [pytest]
+    DJANGO_SETTINGS_MODULE = config.settings
+    python_files = tests.py test_*.py *_tests.py
+
+Create tests/ directory with test files.
+
+
+5. ADD DOCKER SUPPORT
+---------------------
+Create Dockerfile:
+    FROM python:3.11-slim
+
+    WORKDIR /app
+    COPY requirements.txt .
+    RUN pip install --no-cache-dir -r requirements.txt
+
+    COPY . .
+    EXPOSE 8000
+    CMD ["gunicorn", "config.asgi:application", "--bind", "0.0.0.0:8000"]
+
+Create docker-compose.yml:
+    version: '3.8'
+    services:
+      web:
+        build: .
+        ports:
+          - "8000:8000"
+        environment:
+          - DATABASE_URL=postgresql://postgres:postgres@db:5432/pdfschema
+      db:
+        image: postgres:15
+        environment:
+          - POSTGRES_DB=pdfschema
+          - POSTGRES_PASSWORD=postgres
+
+
+6. ADD CI/CD (GitHub Actions)
+-----------------------------
+Create .github/workflows/django.yml:
+    name: Django CI
+
+    on: [push, pull_request]
+
+    jobs:
+      test:
+        runs-on: ubuntu-latest
+        steps:
+          - uses: actions/checkout@v3
+          - name: Set up Python
+            uses: actions/setup-python@v4
+            with:
+              python-version: '3.11'
+          - name: Install dependencies
+            run: pip install -r requirements.txt
+          - name: Run tests
+            run: pytest
+
+
+================================================================================
+PART 3: UPDATED REQUIREMENTS.TXT
+================================================================================
+
+django>=5.1
+djangorestframework>=3.15.0
+django-cors-headers>=4.4.0
+PyPDF2>=3.0.1
+jsonschema>=4.23.0
+djangorestframework-simplejwt>=5.3.0
+gunicorn>=22.0.0
+whitenoise>=1.4.0
+psycopg2-binary>=2.9.0
+python-dotenv>=1.0.0
+drf-spectacular>=0.27.0
+pytest>=7.4.0
+pytest-django>=4.5.0
+
+
+================================================================================
+SUMMARY OF CHANGES NEEDED
+================================================================================
+
+IMMEDIATE PRIORITY:
+[x] 1. Migrate from SQLite to PostgreSQL
+[x] 2. Add python-dotenv for environment variables
+[x] 3. Add psycopg2-binary for PostgreSQL connection
+
+RECOMMENDED:
+[ ] 4. Add drf-spectacular for API documentation
+[ ] 5. Add security middleware settings
+[ ] 6. Add pytest for testing
+[ ] 7. Add Docker support
+[ ] 8. Add CI/CD pipeline
+
+NICE TO HAVE:
+[ ] 9. Add Sentry for error tracking
+[ ] 10. Add logging configuration
+[ ] 11. Upgrade frontend to React/Vue (optional)
+
+
+================================================================================
+NEXT STEPS
+================================================================================
+
+1. First, install PostgreSQL locally or create a cloud database
+2. Update requirements.txt with new packages
+3. Create .env file
+4. Update settings.py to use PostgreSQL
+5. Run migrations
+6. Test the application
+
+Would you like me to implement these changes? I can help you:
+- Update settings.py with PostgreSQL config
+- Update requirements.txt
+- Create .env file
+- Add Docker support
+- Add any other improvements
+
+================================================================================
