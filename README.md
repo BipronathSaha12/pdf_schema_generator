@@ -60,37 +60,6 @@ Navigate to `http://localhost:8000`
 - `Procfile` starts the app with `gunicorn config.wsgi`.
 - `whitenoise` is enabled in Django to serve static assets in production.
 
-## Project Structure
-
-```
-pdf-schema-generator/
-├── backend/
-│   ├── __init__.py
-│   ├── apps.py
-│   ├── pdf_parser.py
-│   ├── schema_generator.py
-│   ├── serializers.py
-│   ├── validator.py
-│   ├── views.py
-│   └── urls.py
-├── config/
-│   ├── __init__.py
-│   ├── asgi.py
-│   ├── settings.py
-│   ├── urls.py
-│   └── wsgi.py
-├── frontend/
-│   ├── index.html
-│   ├── styles.css
-│   └── app.js
-├── examples/
-│   ├── api_request.md
-│   └── invoice_schema.json
-├── db.sqlite3
-├── manage.py
-├── README.md
-└── requirements.txt
-```
 
 ## API Endpoints
 
@@ -118,18 +87,6 @@ pdf-schema-generator/
 ```bash
 curl -X POST http://localhost:8000/api/generate-schema -F "file=@invoice.pdf"
 ```
-
-## Notes
-
-- The frontend is split into `frontend/index.html`, `frontend/styles.css`, and `frontend/app.js`.
-- The backend uses Django views and DRF endpoints defined in `backend/views.py` and `backend/urls.py`.
-
-## Database
-
-See [`DATABASE.md`](./DATABASE.md) for a full description of the SQLite database, table list, ER diagram, and inspection commands.
-
-**TL;DR:** SQLite (`db.sqlite3`) holding only Django's built-in `auth_*`, `django_session`, `django_content_type`, `django_migrations`, and `django_admin_log` tables. The project defines **no custom models** — PDF processing is entirely in-memory.
-
 ## License
 
-This project is licensed under the MIT License. See `LICENSE` for details.
+This project is licensed under the MIT License. See [LICENSE](https://github.com/BipronathSaha12/pdf_schema_generator/blob/main/LICENSE)
