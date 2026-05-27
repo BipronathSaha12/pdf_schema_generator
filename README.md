@@ -60,7 +60,6 @@ Navigate to `http://localhost:8000`
 - `Procfile` starts the app with `gunicorn config.wsgi`.
 - `whitenoise` is enabled in Django to serve static assets in production.
 
-
 ## API Endpoints
 
 | Method | Path | Description |
@@ -87,6 +86,7 @@ Navigate to `http://localhost:8000`
 ```bash
 curl -X POST http://localhost:8000/api/generate-schema -F "file=@invoice.pdf"
 ```
+
 ## License
 
-This project is licensed under the MIT License. See [LICENSE](https://github.com/BipronathSaha12/pdf_schema_generator/blob/main/LICENSE)
+This project is licensed under the MIT License. See [LICENSE](https://github.com/BipronathSaha12/pdf_schema_generator/blob/main/LICENSE) for details.
