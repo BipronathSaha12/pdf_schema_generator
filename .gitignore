@@ -7,4 +7,4 @@ __pycache__/
 *.sqlite3
 staticfiles/
 .env
-UPGRADE_GUIDE.txt 
+DATABASE.md 
